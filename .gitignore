@@ -136,6 +136,6 @@ setup.js
 *.backup
 *.old
 
-# Lock files (optional - some prefer to include package-lock.json)
-# package-lock.json
+# Lock files (exclude for Railway deployment)
+package-lock.json
 # yarn.lock
