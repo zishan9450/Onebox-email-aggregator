@@ -1,0 +1,284 @@
+{
+  "info": {
+    "name": "OneBox Email Aggregator API",
+    "description": "Complete API collection for testing OneBox Email Aggregator features",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Account Management",
+      "item": [
+        {
+          "name": "Add Email Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"your-email@gmail.com\",\n  \"password\": \"your-app-password\",\n  \"imapHost\": \"imap.gmail.com\",\n  \"imapPort\": 993\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/accounts",
+              "host": ["{{baseUrl}}"],
+              "path": ["accounts"]
+            }
+          }
+        },
+        {
+          "name": "Get All Accounts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts",
+              "host": ["{{baseUrl}}"],
+              "path": ["accounts"]
+            }
+          }
+        },
+        {
+          "name": "Get Account by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/{{accountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["accounts", "{{accountId}}"]
+            }
+          }
+        },
+        {
+          "name": "Test Connection",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/{{accountId}}/test-connection",
+              "host": ["{{baseUrl}}"],
+              "path": ["accounts", "{{accountId}}", "test-connection"]
+            }
+          }
+        },
+        {
+          "name": "Sync Account",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/{{accountId}}/sync?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["accounts", "{{accountId}}", "sync"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Account Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/{{accountId}}/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["accounts", "{{accountId}}", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Email Management",
+      "item": [
+        {
+          "name": "Search Emails",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/search?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "search"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Emails with Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/search?query=test&category=interested&accountId={{accountId}}&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "test"
+                },
+                {
+                  "key": "category",
+                  "value": "interested"
+                },
+                {
+                  "key": "accountId",
+                  "value": "{{accountId}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Email by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/{{emailId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "{{emailId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Email",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isRead\": true,\n  \"isFlagged\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/emails/{{emailId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "{{emailId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Email",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/{{emailId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "{{emailId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Email Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Features",
+      "item": [
+        {
+          "name": "Categorize Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/{{emailId}}/categorize",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "{{emailId}}", "categorize"]
+            }
+          }
+        },
+        {
+          "name": "Generate Suggested Reply (RAG)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/emails/{{emailId}}/suggest-reply",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "{{emailId}}", "suggest-reply"]
+            }
+          }
+        },
+        {
+          "name": "Batch Categorize Emails",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emailIds\": [\"{{emailId1}}\", \"{{emailId2}}\", \"{{emailId3}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/emails/batch-categorize",
+              "host": ["{{baseUrl}}"],
+              "path": ["emails", "batch-categorize"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
