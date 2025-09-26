@@ -12,15 +12,21 @@ export class AIService {
   private currentProvider: 'openai' | 'huggingface' | 'local';
 
   constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    // Determine which provider to use based on environment variables
+    this.currentProvider = this.determineProvider();
+    
+    // Only initialize OpenAI if we're using OpenAI provider
+    if (this.currentProvider === 'openai') {
+      this.openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    } else {
+      // Create a dummy OpenAI instance for compatibility
+      this.openai = {} as OpenAI;
+    }
 
     this.huggingFaceService = new HuggingFaceService();
     this.localAIService = new LocalAIService();
-    
-    // Determine which provider to use based on environment variables
-    this.currentProvider = this.determineProvider();
 
     this.productContext = {
       product: "OneBox Email Aggregator - Backend Engineer Application",
