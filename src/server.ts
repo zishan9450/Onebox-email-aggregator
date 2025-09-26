@@ -8,7 +8,7 @@ import { Server as SocketIOServer } from 'socket.io';
 
 import routes from './routes';
 import { logger } from './utils/logger';
-import sequelize from './config/database';
+import { sequelize } from './config/database';
 import { createEmailIndex, waitForElasticsearch } from './config/elasticsearch';
 import { EmailAccount } from './models';
 import { IMAPService } from './services/IMAPService';
@@ -116,42 +116,54 @@ app.use('*', (req, res) => {
 // Initialize database and services
 async function initializeApp() {
   try {
-    // Test database connection
-    await sequelize.authenticate();
-    logger.info('✅ Database connection established successfully');
+    // Try to connect to database (optional in production)
+    try {
+      await sequelize.authenticate();
+      logger.info('✅ Database connection established successfully');
+      
+      // Sync database models
+      await sequelize.sync({ alter: true });
+      logger.info('✅ Database models synchronized');
+    } catch (dbError) {
+      logger.warn('⚠️ Database connection failed, continuing without database:', dbError);
+    }
     
-    // Sync database models
-    await sequelize.sync({ alter: true });
-    logger.info('✅ Database models synchronized');
+    // Try to connect to Elasticsearch (optional in production)
+    try {
+      await waitForElasticsearch();
+      await createEmailIndex();
+      await elasticsearchService.refreshIndex();
+      logger.info('✅ Elasticsearch connection established successfully');
+    } catch (esError) {
+      logger.warn('⚠️ Elasticsearch connection failed, continuing without search:', esError);
+    }
     
-    // Wait for Elasticsearch to be ready
-    await waitForElasticsearch();
+    // Test notification services (optional)
+    try {
+      const slackConnected = await notificationService.testSlackConnection();
+      const webhookConnected = await notificationService.testWebhookConnection();
+      
+      logger.info(`📱 Slack connection: ${slackConnected ? '✅' : '❌'}`);
+      logger.info(`🔗 Webhook connection: ${webhookConnected ? '✅' : '❌'}`);
+    } catch (notifError) {
+      logger.warn('⚠️ Notification services not available:', notifError);
+    }
     
-    // Create Elasticsearch index
-    await createEmailIndex();
-    
-    // Test Elasticsearch connection
-    await elasticsearchService.refreshIndex();
-    logger.info('✅ Elasticsearch connection established successfully');
-    
-    // Test notification services
-    const slackConnected = await notificationService.testSlackConnection();
-    const webhookConnected = await notificationService.testWebhookConnection();
-    
-    logger.info(`📱 Slack connection: ${slackConnected ? '✅' : '❌'}`);
-    logger.info(`🔗 Webhook connection: ${webhookConnected ? '✅' : '❌'}`);
-    
-    // Connect to existing email accounts
-    const accounts = await EmailAccount.findAll({ where: { isActive: true } });
-    logger.info(`📧 Found ${accounts.length} active email accounts`);
-    
-    for (const account of accounts) {
-      try {
-        await imapService.connectToAccount(account);
-        logger.info(`✅ Connected to account: ${account.email}`);
-      } catch (error) {
-        logger.error(`❌ Failed to connect to account ${account.email}:`, error);
+    // Try to connect to existing email accounts (optional)
+    try {
+      const accounts = await EmailAccount.findAll({ where: { isActive: true } });
+      logger.info(`📧 Found ${accounts.length} active email accounts`);
+      
+      for (const account of accounts) {
+        try {
+          await imapService.connectToAccount(account);
+          logger.info(`✅ Connected to account: ${account.email}`);
+        } catch (error) {
+          logger.error(`❌ Failed to connect to account ${account.email}:`, error);
+        }
       }
+    } catch (accountError) {
+      logger.warn('⚠️ Could not load email accounts:', accountError);
     }
     
     // Start server

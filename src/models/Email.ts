@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/database';
+import { sequelize } from '../config/database';
 import { Email as EmailType, EmailCategory } from '../types';
 
 interface EmailCreationAttributes extends Optional<EmailType, 'id' | 'createdAt' | 'updatedAt'> {}
