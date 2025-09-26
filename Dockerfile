@@ -2,11 +2,13 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy package.json first
 COPY package.json ./
 
-# Remove any existing package-lock.json and install dependencies
-RUN rm -f package-lock.json && npm install
+# Remove package-lock.json if it exists and install dependencies
+RUN rm -f package-lock.json && \
+    npm install --production=false && \
+    npm cache clean --force
 
 # Copy source code
 COPY . .
